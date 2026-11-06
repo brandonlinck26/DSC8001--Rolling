@@ -77,6 +77,7 @@ ncol(rolling_raw)
 Here we encounter a lot of missing values; 191 missing ranks for years 2003-2020, missing spotify information are key. Reasons for this include older albums tending towards missing a rank, or that artists have removed their work. We should stand on the side of caution to avoid selection bias.The missing Spotify and genre values do not prevent this analysis because our question does not use those variables. Also, a missing Spotify score alone cannot tell us why it is missing
 
 ```{r}
+#| echo: false
 #empty column inspection
 colSums(is.na(rolling_raw))
 rolling_raw |>
@@ -84,11 +85,18 @@ rolling_raw |>
   is.na() |>
   colSums()
 ```
-
-Saving cleaned data...
-
+###Data Preparation 
+Account for duplicates, excluding however albums by same artist or Na's. 
 ```{r}
+#| echo: false
+sum(duplicated(rolling_raw))
+rolling_unique <- rolling_raw |>
+  distinct()
 
+nrow(rolling_raw) - nrow(rolling_unique)
+
+#how many records remain after removing exact duplicates.
+nrow(rolling_unique)
 ```
 
 Here I have a choice... Dun Dun DUUUH
