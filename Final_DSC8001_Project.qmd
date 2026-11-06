@@ -123,16 +123,53 @@ dim(rolling_selected)
 head(rolling_selected)
 ```
 
-## 
+## Ranking Values
+
+A recorded rank must fall between 1 and 500. Filter() to inspect anything outside that range
 
 ```{r}
+# !na - treating as a valid rank
+notvalid_ranks <- rolling_selected |>
+  filter(
+    (!is.na(rank_2003) & (rank_2003 < 1 | rank_2003 > 500)) |
+    (!is.na(rank_2012) & (rank_2012 < 1 | rank_2012 > 500)) |
+    (!is.na(rank_2020) & (rank_2020 < 1 | rank_2020 > 500))
+  )
 
+# Display any records needing investigation before we change their values.
+notvalid_ranks
+
+# Count how many records contain an out-of-range rank.
+nrow(notvalid_ranks)
 ```
 
-## 
+## Checking ranking editions 
+Having checked ranks 2003-2020, 4 rows have a shared ranking; different artists and albums. These ranks have been left unchanged since no adequate replacements have been located
 
 ```{r}
+#which ranking numbers appear more than once
+#rank 2003
+#| echo: false
+rolling_selected |>
+  filter(!is.na(rank_2003)) |>
+  count(rank_2003) |>
+  filter(n > 1)
+#rank 2012
+rolling_selected |>
+  filter(!is.na(rank_2012)) |>
+  count(rank_2012) |>
+  filter(n > 1)
+#2020's turn
+rolling_selected |>
+  filter(!is.na(rank_2020)) |>
+  count(rank_2020) |>
+  filter(n > 1)
 
+#so only rank 2003- let's find those albums
+# Show the albums with either repeated 2003 rank so we can inspect them.
+rolling_selected |>
+  filter(rank_2003 == 314 | rank_2003 == 493)
+#See below- different albums hence not duplicates
 ```
 
 Compare Spotify Popularity -
