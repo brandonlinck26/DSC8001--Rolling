@@ -1,7 +1,7 @@
 ---
 title: "How has release-decade representation changed in Rolling Stone’s album lists?"
 author: "Brandon Linck-Hernandez"
-date: "2026-11-06"
+date: "2026-11-01"
 format:
   html:
     embed-resources: true
