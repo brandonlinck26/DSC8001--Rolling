@@ -172,10 +172,24 @@ rolling_selected |>
 #See below- different albums hence not duplicates
 ```
 
-Compare Spotify Popularity -
+## Release Decade Column; we wish to make comparisons keeping album rows - using a vectorized function, we use Mutate(). The calculation (release_year / 10) * 10 groups allows for a comparison of both individual years and decades without loop
 
 ```{r}
+#| echo: false
+#  group albums into ten-year periods.
+# Divide each release year by 10
+# Multiply by 10 to obtain the decade's starting year.
+rolling_clean <- rolling_selected |>
+  mutate(
+    release_decade = (release_year %/% 10) * 10
+  )
+# Release years vs decades shown
+rolling_clean |>
+  select(clean_name, album, release_year, release_decade) |>
+  head(10)
 
+# Check that  we now have seven columns.
+dim(rolling_clean)
 ```
 
 Prepare three periods
