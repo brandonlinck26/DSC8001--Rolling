@@ -248,15 +248,128 @@ head(artist_list, 10)
 
 ```
 
-GGPLOT Time!!!
+## Preparing our Location Table
 
 ```{r}
+# Start with one row per artist to avoid multiplying album rows during the join.
+artist_locations <- artist_list |>
+  mutate(
+    # Create text columns for verified country and city/town information.
+    # NA_character_ means a missing text value, not a guessed location.
+    country = NA_character_,
+    region = NA_character_,
+
+    # Record whether the location describes birthplace or band formation.
+    location_basis = NA_character_,
+
+    # Keep a source link so each location can be checked.
+    source = NA_character_
+  )
+
+# Check that the table has 386 artists and five columns.
+dim(artist_locations)
+
+# Inspect the structure before adding verified location information.
+head(artist_locations, 10)
 
 ```
 
 ```{r}
+# I missed out genre column so must amend
 
+rolling_selected <- rolling_unique |>
+  select(
+    clean_name,
+    album,
+    release_year,
+    genre,
+    rank_2003,
+    rank_2012,
+    rank_2020
+  )
 
+# Rebuild the prepared data with genre included and release decade added.
+rolling_clean <- rolling_selected |>
+  mutate(
+    release_decade = (release_year %/% 10) * 10
+  )
+
+# Check the dimensions and number of missing genre values.
+dim(rolling_clean)
+sum(is.na(rolling_clean$genre))
+```
+
+##Preparing release years and genres for plotting
+
+```{r}
+# Keep genre and release year alongside each recorded rank.
+rolling_hist_data <- rolling_clean |>
+  pivot_longer(
+    cols = c(rank_2003, rank_2012, rank_2020),
+    names_to = "edition",
+    names_prefix = "rank_",
+    values_to = "rank"
+  ) |>
+  # Include an album in an edition's histogram only when its rank is recorded.
+  # This creates a plotting subset; rolling_clean keeps all original NA values.
+  filter(!is.na(rank)) |>
+  mutate(
+    # Label missing genres so these albums remain visible in the chart.
+    # This label does not guess the missing genre.
+    genre_display = if_else(
+      is.na(genre),
+      "Genre not recorded",
+      genre
+    )
+  )
+
+# Check that each edition contributes 500 albums.
+rolling_hist_data |>
+  count(edition)
+
+# Inspecting the genre labels .
+rolling_hist_data |>
+  distinct(genre_display) |>
+  arrange(genre_display)
+```
+## ggplot time!!
+
+```{r}
+#just check first it's installed
+library(ggplot2)
+```
+
+```{r}
+#remember x3 things required 
+base_plot <- ggplot(
+  data = rolling_hist_data,
+  aes(x = release_year)
+) +
+  # Add labels explaining what the chart will show.
+  labs(
+    title = "Release decades and genres in Rolling Stone's album lists",
+    x = "Album release year",
+    y = "Number of albums",
+    fill = "Genre"
+  )
+
+base_plot
 ```
 
 ## Adding more style
+```{r}
+histogram_plot <- base_plot +
+  geom_histogram(
+    aes(fill = genre_display),
+    binwidth = 10,
+    boundary = 1950,
+    closed = "left"
+  ) +
+  facet_wrap(~ edition, ncol = 1)
+# genre text is too high; amendment
+histogram_plot <- histogram_plot +
+  labs(
+    title = "Release decades and genres\nin Rolling Stone's album lists"
+  )
+histogram_plot
+```
