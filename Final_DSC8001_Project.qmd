@@ -231,6 +231,23 @@ decade_summary |>
 #1950- are all ~10-11 albums the same or what variation do we see
 ```
 
+Preparing artist location data
+```{r}
+
+# Keep one row per artist because location information belongs to the artist.
+# This prevents us from researching the same artist separately for every album.
+artist_list <- rolling_clean |>
+  distinct(clean_name) |>
+  arrange(clean_name)
+
+# Count how many artists need location information.
+nrow(artist_list)
+
+# Inspect the first ten names before sourcing their locations.
+head(artist_list, 10)
+
+```
+
 GGPLOT Time!!!
 
 ```{r}
