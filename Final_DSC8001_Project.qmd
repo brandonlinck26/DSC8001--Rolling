@@ -1,11 +1,126 @@
 ---
-title: "Final_DSC8001_Project"
+title: "How has release-decade representation changed in Rolling Stone’s album lists?"
+author: "Brandon Linck-Hernandez"
+date: "2026-11-06"
+format:
+  html:
+    embed-resources: true
 ---
 
-## Quarto
+## Introduction
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+In an era of digital streaming versus physical media, prediction for artist success within the music industry can be challenging.
+
+Using the CRISP-DM methodology and tidyverse R packages, we will be exploring a data set from Rolling Stones: 500 Greatest Albums of All Time. Here, we will walk through the methods used to ascertain patterns related to music rankings.
+
+## Background
+
+Beginning in 2003, the Rolling Stones magazine lists an editorial ranking for the albums deemed most significant within the world of music. Whilst Rolling Stones have updated their canon to include current artists on streaming platforms such as Spotify, artists do often remove their discography from streaming services for various reasons; more recently in 18 September 2025, Massive Attack announced their boycott of Spotify under 'No Music for Genocide'. Another challenge which affects music data and may impact popularity is licensing changes; where the availability of albums to users i.e MBV, Taylor Swift may be altogether restricted or, in some cases, only available in certain countries.
+
+## Business Understanding
+
+The purpose is to describe how the lists’ composition changed. These rankings do not directly measure album sales or represent everyone’s musical preferences, yet it may be of use for those within the realm of marketing to identify a strategy to target online audiences to raise artist interest and boost success.
+
+### Objective
+
+Understand the relationship between album ranking and Spotify streams, so that artists and record companies can make informed decisions to maintain commercial performance. The following questions will be considered:
+
+1.  How is Spotify popularity associated with an album’s position in Rolling Stone’s 3 year rankings?
+
+2.  Can an album’s release year, genre and historical Billboard performance predict its Spotify popularity?
+
+## Skeleton of Report
+
+We load and describe the raw album data We use Dplyr and process We decide what within ggplot suits our data We visualize it
 
 ```{r}
-1 + 1
+#| echo: false
+#| message: false
+system("git --version")
 ```
+
+## Data Understanding & Initial Exploration
+
+We started by loading a raw data set containing various artist metrics. The data set includes objects such as name, year of release, type of album, genre, rank (based on year ranked) and Spotify popularity.
+
+```{r}
+library(tidyverse)
+
+# importing my data
+rolling_raw <- read_csv(
+  "rolling_stone.csv",
+  na = c("", "NA"),
+  show_col_types = FALSE
+)
+```
+
+## Data Preparation
+
+When inspecting data types we encounter a lot of missing values. Especially for older albums, they tend to be missing a rank. We should stand on the side of caution to avoid selection bias- if we removed the majority of older albums it would affect results \*see line 101
+
+```{r}
+
+```
+
+### Utilising select()
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+Saving cleaned data...
+
+```{r}
+
+```
+
+Here I have a choice... Dun Dun DUUUH
+
+## Mutate vs Summarise
+
+I wish to make comparisons keeping album rows - a vectorized function Hence I'm going to use Mutate()
+
+```{r}
+
+```
+
+## Identifying the largest changes
+
+```{r}
+
+```
+
+Counting in each group:
+
+```{r}
+
+```
+
+Compare Spotify Popularity -
+
+```{r}
+
+```
+
+Prepare three periods
+
+```{r}
+
+```
+
+GGPLOT Time!!!
+
+```{r}
+
+```
+
+```{r}
+
+
+```
+
+## Adding more style
