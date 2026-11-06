@@ -192,10 +192,43 @@ rolling_clean |>
 dim(rolling_clean)
 ```
 
-Prepare three periods
+Grouping by release date:
 
 ```{r}
+#calculating counts for release decade....
+decade_summary <- rolling_clean |>
+  group_by(release_decade) |>
+  summarise(
+    # Count non-missing ranks without changing the original album data.
+    albums_2003 = sum(!is.na(rank_2003)),
+    albums_2012 = sum(!is.na(rank_2012)),
+    albums_2020 = sum(!is.na(rank_2020)),
 
+    # Remove grouping from the completed summary.
+    .groups = "drop"
+  )
+```
+
+```{r}
+# ordering
+decade_summary <- decade_summary |>
+  arrange(release_decade)
+
+# inspect counts
+decade_summary
+
+#peace of mind check- must add up to 500 so that ranks have been kept
+# Add the decade counts to check that each edition has 500 recorded entries.
+# This checks our summary without changing the album data.
+decade_summary |>
+  summarise(
+    total_2003 = sum(albums_2003),
+    total_2012 = sum(albums_2012),
+    total_2020 = sum(albums_2020)
+  )
+#As one would expect, with time older albums become less popular/rank goes down with time- more modern releases seen to be more influential?
+
+#1950- are all ~10-11 albums the same or what variation do we see
 ```
 
 GGPLOT Time!!!
