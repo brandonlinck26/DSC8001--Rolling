@@ -29,7 +29,7 @@ Understand the relationship between album ranking and Spotify streams, so that a
 
 2.  Can an album’s release year, genre and historical Billboard performance predict its Spotify popularity?
 
-## Skeleton of Report
+### Skeleton of Report
 
 We load and describe the raw album data We use Dplyr and process We decide what within ggplot suits our data We visualize it
 
@@ -72,7 +72,7 @@ nrow(rolling_raw)
 ncol(rolling_raw)
 ```
 
-#Consideration 1: Missing values
+## Consideration 1: Missing values
 
 Here we encounter a lot of missing values; 191 missing ranks for years 2003-2020, missing spotify information are key. Reasons for this include older albums tending towards missing a rank, or that artists have removed their work. We should stand on the side of caution to avoid selection bias.The missing Spotify and genre values do not prevent this analysis because our question does not use those variables. Also, a missing Spotify score alone cannot tell us why it is missing
 
@@ -85,8 +85,9 @@ rolling_raw |>
   is.na() |>
   colSums()
 ```
-###Data Preparation 
-Account for duplicates, excluding however albums by same artist or Na's. 
+
+## Data Preparation Account for duplicates, excluding however albums by same artist or Na's.
+
 ```{r}
 #| echo: false
 sum(duplicated(rolling_raw))
@@ -99,23 +100,36 @@ nrow(rolling_raw) - nrow(rolling_unique)
 nrow(rolling_unique)
 ```
 
-Here I have a choice... Dun Dun DUUUH
+### Selecting- Keeping release year and ranks
 
-## Mutate vs Summarise
+```{r}
+#| echo: false
+#| # I want album identifiers, release year and rankings retained for decade comparisons.
+# Select() use preserves all rows, including values w missing ranks.
+rolling_selected <- rolling_unique |>
+  select(
+    clean_name,
+    album,
+    release_year,
+    rank_2003,
+    rank_2012,
+    rank_2020
+  )
 
-I wish to make comparisons keeping album rows - a vectorized function Hence I'm going to use Mutate()
+# Have we kept all album records and selected six columns.
+dim(rolling_selected)
+
+# See first six records to check columns.
+head(rolling_selected)
+```
+
+## 
 
 ```{r}
 
 ```
 
-## Identifying the largest changes
-
-```{r}
-
-```
-
-Counting in each group:
+## 
 
 ```{r}
 
