@@ -25,7 +25,7 @@ The purpose is to describe how the lists’ composition changed. These rankings 
 
 Understand the relationship between album ranking and Spotify streams, so that artists and record companies can make informed decisions to maintain commercial performance. The following questions will be considered:
 
-1.  How is Spotify popularity associated with an album’s position in Rolling Stone’s 3 year rankings?
+1.  How is Spotify popularity associated with an album’s position in Rolling Stone 3 year rankings?
 
 2.  Can an album’s release year, genre and historical Billboard performance predict its Spotify popularity?
 
@@ -44,6 +44,7 @@ system("git --version")
 We started by loading a raw data set containing various artist metrics. The data set includes objects such as name, year of release, type of album, genre, rank (based on year ranked) and Spotify popularity.
 
 ```{r}
+#| echo: false
 library(tidyverse)
 
 # importing my data
@@ -54,22 +55,34 @@ rolling_raw <- read_csv(
 )
 ```
 
-## Data Preparation
-
-When inspecting data types we encounter a lot of missing values. Especially for older albums, they tend to be missing a rank. We should stand on the side of caution to avoid selection bias- if we removed the majority of older albums it would affect results \*see line 101
+We want to understand what each data type is before changing any behaviors; release year appears as <dbl> -\> does not need converting as years are whole numbers.
 
 ```{r}
-
+#| echo: false
+head(rolling_raw)
+glimpse(rolling_raw)
+#check to identify if csv file contained bits R can't read on import
+problems(rolling_raw)
 ```
 
-### Utilising select()
+### Counting rows and columns - how many albums do we begin with?
 
 ```{r}
-
+nrow(rolling_raw)
+ncol(rolling_raw)
 ```
 
-```{r}
+#Consideration 1: Missing values
 
+Here we encounter a lot of missing values; 191 missing ranks for years 2003-2020, missing spotify information are key. Reasons for this include older albums tending towards missing a rank, or that artists have removed their work. We should stand on the side of caution to avoid selection bias.The missing Spotify and genre values do not prevent this analysis because our question does not use those variables. Also, a missing Spotify score alone cannot tell us why it is missing
+
+```{r}
+#empty column inspection
+colSums(is.na(rolling_raw))
+rolling_raw |>
+  select(release_year, rank_2003, rank_2012, rank_2020) |>
+  is.na() |>
+  colSums()
 ```
 
 Saving cleaned data...
