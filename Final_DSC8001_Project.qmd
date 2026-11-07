@@ -5,8 +5,10 @@ date: "2026-11-01"
 format:
   html:
     embed-resources: true
-    
+
 execute:
+  echo: false
+  include: false
   warning: false
   message: false
 ---
@@ -48,9 +50,7 @@ rolling_raw <- read_csv(
 )
 ```
 
-::: callout-note
 We want to understand what each data type is before changing any behaviors; release year appears as <dbl> -\> does not need converting as years are whole numbers.
-:::
 
 ```{r}
 #| echo: false
@@ -135,7 +135,9 @@ nrow(notvalid_ranks)
 ```
 
 ### Repeated Rankings
+
 Four albums have repeated shared rankings within the data. Since they are different artists and different names, they are not regarded as duplicates hence are retained.
+
 ```{r}
 #which ranking numbers appear more than once...?
 #rank 2003
@@ -167,7 +169,7 @@ rolling_selected |>
 Albums were grouped into release decades using integer division. Mutate() adds this grouping while retaining every album record
 
 ::: callout-note
-The calculation (release_year / 10) \* 10 groups allows for a comparison of both individual years and decades without loop. 
+The calculation (release_year / 10) \* 10 groups allows for a comparison of both individual years and decades without loop.
 :::
 
 ```{r}
@@ -225,7 +227,9 @@ decade_summary |>
 ```
 
 ### 3.8 Calculating and displaying changes
+
 We calculate the change in album counts for each release decade between 2003 and 2020, then sort the results from the largest increase to the largest decrease. Positive values indicate more entries in 202 & negative values indicate fewer.
+
 ```{r}
 # Calculate how many more or fewer albums each decade has in the 2020 edition.
 # Sort from the largest increase to the largest decrease.
@@ -238,7 +242,9 @@ decade_changes <- decade_summary |>
 decade_changes
 ```
 
-### 3.9 Formatting Data for Modelling Phase We prepare longer columns for our modelling and label unrecorded values.This leaves exactly the 500 albums in each of the 2003, 2012 and 2020 lists; all prepared for ggplot2 use and doesn't need converting since same weight.
+### 3.9 Formatting Data for Modelling Phase
+
+We prepare longer columns for our modelling and label unrecorded values.This leaves exactly the 500 albums in each of the 2003, 2012 and 2020 lists; all prepared for ggplot2 use and doesn't need converting since same weight.
 
 ```{r}
 # Keep genre and release year alongside each recorded rank.
@@ -301,6 +307,7 @@ genre_counts <- rolling_hist_data |>
 ```
 
 ### 3.11 Changes in representation
+
 Genre counts were arranged into separate columns for each edition. The differences were calculated and sorted from the largest increase to the largest decrease.
 
 ```{r}
@@ -341,8 +348,6 @@ base_plot <- ggplot(
     y = "Number of albums",
     fill = "Genre"
   )
-
-base_plot
 ```
 
 ### 4.2 Stylizing
@@ -350,6 +355,10 @@ base_plot
 Histogram formatted with release years in ten-year bins, colored by genre and split by yearly edition
 
 ```{r}
+#| include: true
+#| echo: false
+#| fig-width: 11
+#| fig-height: 9
 histogram_plot <- base_plot +
   geom_histogram(
     aes(fill = genre_display),
@@ -368,9 +377,13 @@ histogram_plot
 
 ### 4.3 Changes in yearly representation of genres
 
-Grouped by release decade. Bars are coloured by direction: positive values mean more albums in 2020, negative values mean fewer.
+Bar chart compares genre counts between the 2003 and 2020.Each bar represents the difference in album counts, being colour coded to show positive or negative changes. Rather than a change in ranking position, it measures the growth in genre amounts. “Genre not recorded” identifies albums with missing genre information
 
 ```{r}
+#| include: true
+#| echo: false
+#| fig-width: 11
+#| fig-height: 8
 # Positive values mean more albums in 2020; negative values mean fewer.
 genre_changes <- genre_changes |>
   mutate(
@@ -408,21 +421,4 @@ genre_change_plot <- ggplot(
 
 genre_change_plot
 
-```
-
-## Calculating the changes in Genre Representation
-
-```{r}
-year_summary <- rolling_hist_data |>
-  group_by(edition) |>
-  summarise(
-    albums           = n(),
-    mean_year        = mean(release_year),
-    median_year      = median(release_year),
-    sd_year          = sd(release_year),
-    share_since_1990 = mean(release_year >= 1990)
-  ) |>
-  ungroup()
-
-year_summary
 ```
