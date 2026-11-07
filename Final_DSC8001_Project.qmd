@@ -27,8 +27,9 @@ Listed rankings of music will always be subjective. The patterns in genres that 
 
 Questions to answer:
 
-1.  How has the representation of album rankings changed across the years (what's in now?)
+1.  How has the representation of album rankings changed across the years 
 2.  What genres are highest rated over time and will be consistently popular?
+3. What's in now; emerging trends and popular genres within the market
 
 ## 3.0 Data Understanding & Initial Exploration
 
@@ -321,10 +322,9 @@ We compare album counts by release decade and genre across the 2003, 2012 and 20
 
 No predictive model is fitted: the questions are descriptive; analysis consists of quantifying differences between the lists.
 
-### 4.1 Setting up base plot
-
 ```{r}
 #remember x3 things required
+#Setting up base plot
 library(ggplot2)
 base_plot <- ggplot(
   data = rolling_hist_data,
@@ -339,7 +339,7 @@ base_plot <- ggplot(
   )
 ```
 
-### 4.2 Genre Density per Release Year
+### 4.1 Genre Density per Release Year
 
 Figure 1. Histogram formatted with release years in decade intervals; displays the distribution of genres along a timeline from 1950-2020 as ranked by each edition of Rolling Stone magazine.
 
@@ -364,9 +364,9 @@ histogram_plot <- histogram_plot +
 histogram_plot
 ```
 
-Genres and music from the 1970s remained the most represented release decade across all three editions; unsurprisingly as Stone Rose Magazine ranks Sgt Peppers' Lonely Hearts at #1. The 1960s experienced the largest decrease, falling from 111 to 71 entries. In contrast, representation of the 1990s increased from 78 to 104 albums. Albums from the 2000s rose from 22 to 51 and the 2010s reached 36 entries in 2020.
+Genres and music from the 1970s remained the most represented release decade across all three editions. The 1960s experienced the largest decrease, falling from 111 to 71 entries. In contrast, representation of the 1990s increased from 78 to 104 albums. Albums from the 2000s rose from 22 to 51 and the 2010s reached 36 entries in 2020.
 
-### 4.3 Changes in yearly representation of genres
+### 4.2 Changes in yearly representation of genres
 
 Figure 2. Changes in genre representation between the 2003 and 2020. Bars represent the difference in album counts, being color coded to show positive or negative changes. Rather than a change in ranking position, it measures the increase or decline in genre density. “Genre not recorded” identifies albums with missing genre information
 
@@ -414,4 +414,15 @@ genre_change_plot
 
 ```
 
-Most apparent is the large increase in Hip-Hop/Rap albums; rising from 26 albums in 2003 to 57 in 2020. Soul/Gospel/R&B gained 20 entries, followed by Indie/Alternative Rock with 12. Blues/Blues Rock experienced the largest decline, falling from 61 to 29 albums. Punk/Post-Punk/New Wave/Power Pop decreased by 14 entries, while Singer-Songwriter/Heartland Rock declined by 11. Big Band/Jazz remained unchanged
+Most apparent is the large increase in Hip-Hop/Rap albums; rising from 26 albums in 2003 to 57 in 2020. Blues/Blues Rock experienced the largest decline, falling from 61 to 29 albums. Big Band/Jazz remained unchanged
+
+## 5.0 Evaluation
+
+Our analysis identifies key changes within the rolling stones ranking and growth in representation of genres in the 2020s. The release-year distributions were not clearly bell-shaped or symmetric. All editions showed a dominant peak in the 1970s. It could be a suggestion for current artists to create a brand image or products which fall into genres that are consistently ranked highly i.e Rock and Roll, Funk, New Wave.
+
+As shown by Figure 2, the analysis shows a change in the counts of albums; Hip-Hop/Rap albums showed the largest increase, gaining 31 entries, followed by Soul/Gospel/R&B with 20 and Indie/Alternative Rock with 12. Blues/Blues Rock experienced the largest decline, losing 32 entries. 
+
+From a business perspective, the results may enable the targeting of either popular genres within the pool to boost artist success. Especially in the current era of the 2020s, Reggae ton artists like Bad Bunny have seen record breaking growth and boost in popularity; in relation to our data it may be a result of engagement with two key genres emerging within the current decade - Latin and Rap.
+
+### Key Limitations 
+However, increased representation does not demonstrate increased consumer demand or guarantee commercial success. The analysis ends in 2020, so it cannot establish what is currently trending. Recent streaming, sales and audience data would be needed to support present-day marketing decisions.
