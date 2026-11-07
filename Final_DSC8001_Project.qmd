@@ -5,49 +5,42 @@ date: "2026-11-01"
 format:
   html:
     embed-resources: true
+    
+execute:
+  warning: false
+  message: false
 ---
 
-## Introduction
+## 1. Introduction
 
-In an era of digital streaming versus physical media, prediction for artist success within the music industry can be challenging.
+Rolling Stone Magazine's *500 Greatest Albums of All Time* has been published in three editions. Each ranking is a judgement on an album's (studio or complication) industrial significance and popularity rather than an objective assessment of album revenue. We use the CRISP-DM framework and Tidyverse tools in R Studio to assess the changing composition of this list between 2003-2020.
 
-Using the CRISP-DM methodology and tidyverse R packages, we will be exploring a data set from Rolling Stones: 500 Greatest Albums of All Time. Here, we will walk through the methods used to ascertain patterns related to music rankings.
+The study will rely on the lists themselves rather than the streaming metrics contained within the data set- streaming has both made music more accessible and also less available, usually via artists withdrawing their catalogs (i.e MBV, Massive Attack in regards to boycotts) or even as a result of change in producer rights.
 
-## Background
+## 2.1 Business Understanding
 
-Beginning in 2003, the Rolling Stones magazine lists an editorial ranking for the albums deemed most significant within the world of music. Whilst Rolling Stones have updated their canon to include current artists on streaming platforms such as Spotify, artists do often remove their discography from streaming services for various reasons; more recently in 18 September 2025, Massive Attack announced their boycott of Spotify under 'No Music for Genocide'. Another challenge which affects music data and may impact popularity is licensing changes; where the availability of albums to users i.e MBV, Taylor Swift may be altogether restricted or, in some cases, only available in certain countries.
+Listed rankings of music will always be subjective. The patterns in genres that are favourable and eras that are continually popular should lend towards those within the marketing realm or, to aid artists to change their brand in the support of their individual success; to see what's trending may indicate what to tap into. Equally, artists can be advised on whether to engage more with streaming services if there has been a significant dip since their exit from such providers.
 
-## Business Understanding
+### 2.2 Objective
 
-The purpose is to describe how the lists’ composition changed. These rankings do not directly measure album sales or represent everyone’s musical preferences, yet it may be of use for those within the realm of marketing to identify a strategy to target online audiences to raise artist interest and boost success.
+Questions to answer:
 
-### Objective
+1.  How has the representation of album rankings changed across 2003, 2012, and 2020 editions?
+2.  Have older releases been impacted and could this be a result of the advent of modern streaming of music?
 
-Understand the relationship between album ranking and Spotify streams, so that artists and record companies can make informed decisions to maintain commercial performance. The following questions will be considered:
+## 3.0 Data Understanding & Initial Exploration
 
-1.  How is Spotify popularity associated with an album’s position in Rolling Stone 3 year rankings?
+We imported raw data from the rolling stone ranked albums list to use dplyr to clean. The raw data has one row per album, with artist name, title, year of release, genre, album type and yearly rank. The data of interest is continuous and ordered on a timeline from years 2003-2020.
 
-2.  Can an album’s release year, genre and historical Billboard performance predict its Spotify popularity?
-
-### Skeleton of Report
-
-We load and describe the raw album data We use Dplyr and process We decide what within ggplot suits our data We visualize it
-
-```{r}
-#| echo: false
-#| message: false
-system("git --version")
-```
-
-## Data Understanding & Initial Exploration
-
-We started by loading a raw data set containing various artist metrics. The data set includes objects such as name, year of release, type of album, genre, rank (based on year ranked) and Spotify popularity.
+::: callout-note
+To begin: Row and column counts were checked with nrow(), ncol(), glimpse().
+:::
 
 ```{r}
 #| echo: false
 library(tidyverse)
 
-# importing my data
+# importing my data using readr, then treating empty cells as NA
 rolling_raw <- read_csv(
   "rolling_stone.csv",
   na = c("", "NA"),
@@ -55,79 +48,80 @@ rolling_raw <- read_csv(
 )
 ```
 
+::: callout-note
 We want to understand what each data type is before changing any behaviors; release year appears as <dbl> -\> does not need converting as years are whole numbers.
+:::
 
 ```{r}
 #| echo: false
 head(rolling_raw)
+nrow(rolling_raw)
+ncol(rolling_raw)
 glimpse(rolling_raw)
+# counting full dataset- 691 albums with 21 rows
+nrow(rolling_raw)
+ncol(rolling_raw)
 #check to identify if csv file contained bits R can't read on import
 problems(rolling_raw)
 ```
 
-### Counting rows and columns - how many albums do we begin with?
+### 3.1 Missing Values
 
-```{r}
-nrow(rolling_raw)
-ncol(rolling_raw)
-```
+Each ranking column contains 191 missing values, leaving 500 recorded entries per edition. Missing ranks are retained to avoid selection bias; an album may have a recorded position in one edition but not another.
 
-## Consideration 1: Missing values
-
-Here we encounter a lot of missing values; 191 missing ranks for years 2003-2020, missing spotify information are key. Reasons for this include older albums tending towards missing a rank, or that artists have removed their work. We should stand on the side of caution to avoid selection bias.The missing Spotify and genre values do not prevent this analysis because our question does not use those variables. Also, a missing Spotify score alone cannot tell us why it is missing
+Release year is complete, allowing all albums to be grouped to a decade. Genre is missing for 164 albums; these records are retained and labelled “Genre not recorded” for visualisation
 
 ```{r}
 #| echo: false
 #empty column inspection
-colSums(is.na(rolling_raw))
 rolling_raw |>
-  select(release_year, rank_2003, rank_2012, rank_2020) |>
+  select(release_year, genre, rank_2003, rank_2012, rank_2020) |>
   is.na() |>
   colSums()
 ```
 
-## Data Preparation Account for duplicates, excluding however albums by same artist or Na's.
+### 3.2 Accounting for duplicates and shared values.
+
+We want to remove any duplicates of albums i.e studio and complication which will affect ranking, yet still including albums by same artist or Na's. Furthermore, ranks may be shared and we want to reassign or disclude these rankings.
 
 ```{r}
 #| echo: false
+# I want to count duplicated rows and amend using duplicated() + distinct()
 sum(duplicated(rolling_raw))
 rolling_unique <- rolling_raw |>
   distinct()
 
 nrow(rolling_raw) - nrow(rolling_unique)
 
-#how many records remain after removing exact duplicates.
+#how many records remain after removing exact duplicate- (0-0) all still present which is good!
 nrow(rolling_unique)
 ```
 
-### Selecting- Keeping release year and ranks
+### 3.3 Selecting Relevant Variables
+
+Here we assign our identifiers and cut down the data, focusing on Rolling Stone ranking and year of release.
 
 ```{r}
 #| echo: false
-#| # I want album identifiers, release year and rankings retained for decade comparisons.
-# Select() use preserves all rows, including values w missing ranks.
+# Keep identifiers and the variables needed for decade and genre comparisons.
 rolling_selected <- rolling_unique |>
   select(
     clean_name,
     album,
     release_year,
+    genre,
     rank_2003,
     rank_2012,
     rank_2020
   )
-
-# Have we kept all album records and selected six columns.
-dim(rolling_selected)
-
-# See first six records to check columns.
-head(rolling_selected)
 ```
 
-## Ranking Values
+### 3.4 Ranking Values
 
-A recorded rank must fall between 1 and 500. Filter() to inspect anything outside that range
+Across the 2003 to 2020 editions, four rows share a rank (in 2003 only): in each case the albums and artists are different, so they are not duplicates. These ranks have been left unchanged because no adequate replacements could be found.
 
 ```{r}
+#| echo: false
 # !na - treating as a valid rank
 notvalid_ranks <- rolling_selected |>
   filter(
@@ -136,18 +130,14 @@ notvalid_ranks <- rolling_selected |>
     (!is.na(rank_2020) & (rank_2020 < 1 | rank_2020 > 500))
   )
 
-# Display any records needing investigation before we change their values.
-notvalid_ranks
-
 # Count how many records contain an out-of-range rank.
 nrow(notvalid_ranks)
 ```
 
-## Checking ranking editions 
-Having checked ranks 2003-2020, 4 rows have a shared ranking; different artists and albums. These ranks have been left unchanged since no adequate replacements have been located
-
+### Repeated Rankings
+Four albums have repeated shared rankings within the data. Since they are different artists and different names, they are not regarded as duplicates hence are retained.
 ```{r}
-#which ranking numbers appear more than once
+#which ranking numbers appear more than once...?
 #rank 2003
 #| echo: false
 rolling_selected |>
@@ -169,10 +159,16 @@ rolling_selected |>
 # Show the albums with either repeated 2003 rank so we can inspect them.
 rolling_selected |>
   filter(rank_2003 == 314 | rank_2003 == 493)
-#See below- different albums hence not duplicates
+#See above- different albums hence not duplicates
 ```
 
-## Release Decade Column; we wish to make comparisons keeping album rows - using a vectorized function, we use Mutate(). The calculation (release_year / 10) * 10 groups allows for a comparison of both individual years and decades without loop
+### 3.6 Release Decade Column
+
+Albums were grouped into release decades using integer division. Mutate() adds this grouping while retaining every album record
+
+::: callout-note
+The calculation (release_year / 10) \* 10 groups allows for a comparison of both individual years and decades without loop. 
+:::
 
 ```{r}
 #| echo: false
@@ -183,16 +179,11 @@ rolling_clean <- rolling_selected |>
   mutate(
     release_decade = (release_year %/% 10) * 10
   )
-# Release years vs decades shown
-rolling_clean |>
-  select(clean_name, album, release_year, release_decade) |>
-  head(10)
-
-# Check that  we now have seven columns.
-dim(rolling_clean)
 ```
 
-Grouping by release date:
+### 3.7 Counting albums per decade
+
+Grouping by release decade; counting ranks per edition (year) and summarising in one row:
 
 ```{r}
 #calculating counts for release decade....
@@ -202,15 +193,17 @@ decade_summary <- rolling_clean |>
     # Count non-missing ranks without changing the original album data.
     albums_2003 = sum(!is.na(rank_2003)),
     albums_2012 = sum(!is.na(rank_2012)),
-    albums_2020 = sum(!is.na(rank_2020)),
-
-    # Remove grouping from the completed summary.
-    .groups = "drop"
-  )
+    albums_2020 = sum(!is.na(rank_2020))
+  ) |>
+  # Remove grouping from the completed summary so later steps treat it as an ordinary table.
+  ungroup()
 ```
 
+### 3.8 Ordering our release table
+
+Here, we resort our row ordering; nothing in the data but decade order changes
+
 ```{r}
-# ordering
 decade_summary <- decade_summary |>
   arrange(release_decade)
 
@@ -231,75 +224,21 @@ decade_summary |>
 #1950- are all ~10-11 albums the same or what variation do we see
 ```
 
-Preparing artist location data
+### 3.8 Calculating and displaying changes
+We calculate the change in album counts for each release decade between 2003 and 2020, then sort the results from the largest increase to the largest decrease. Positive values indicate more entries in 202 & negative values indicate fewer.
 ```{r}
-
-# Keep one row per artist because location information belongs to the artist.
-# This prevents us from researching the same artist separately for every album.
-artist_list <- rolling_clean |>
-  distinct(clean_name) |>
-  arrange(clean_name)
-
-# Count how many artists need location information.
-nrow(artist_list)
-
-# Inspect the first ten names before sourcing their locations.
-head(artist_list, 10)
-
-```
-
-## Preparing our Location Table
-
-```{r}
-# Start with one row per artist to avoid multiplying album rows during the join.
-artist_locations <- artist_list |>
+# Calculate how many more or fewer albums each decade has in the 2020 edition.
+# Sort from the largest increase to the largest decrease.
+decade_changes <- decade_summary |>
   mutate(
-    # Create text columns for verified country and city/town information.
-    # NA_character_ means a missing text value, not a guessed location.
-    country = NA_character_,
-    region = NA_character_,
+    change_2003_2020 = albums_2020 - albums_2003
+  ) |>
+  arrange(desc(change_2003_2020))
 
-    # Record whether the location describes birthplace or band formation.
-    location_basis = NA_character_,
-
-    # Keep a source link so each location can be checked.
-    source = NA_character_
-  )
-
-# Check that the table has 386 artists and five columns.
-dim(artist_locations)
-
-# Inspect the structure before adding verified location information.
-head(artist_locations, 10)
-
+decade_changes
 ```
 
-```{r}
-# I missed out genre column so must amend
-
-rolling_selected <- rolling_unique |>
-  select(
-    clean_name,
-    album,
-    release_year,
-    genre,
-    rank_2003,
-    rank_2012,
-    rank_2020
-  )
-
-# Rebuild the prepared data with genre included and release decade added.
-rolling_clean <- rolling_selected |>
-  mutate(
-    release_decade = (release_year %/% 10) * 10
-  )
-
-# Check the dimensions and number of missing genre values.
-dim(rolling_clean)
-sum(is.na(rolling_clean$genre))
-```
-
-##Preparing release years and genres for plotting
+### 3.9 Formatting Data for Modelling Phase We prepare longer columns for our modelling and label unrecorded values.This leaves exactly the 500 albums in each of the 2003, 2012 and 2020 lists; all prepared for ggplot2 use and doesn't need converting since same weight.
 
 ```{r}
 # Keep genre and release year alongside each recorded rank.
@@ -310,20 +249,19 @@ rolling_hist_data <- rolling_clean |>
     names_prefix = "rank_",
     values_to = "rank"
   ) |>
-  # Include an album in an edition's histogram only when its rank is recorded.
+  # Include an album in an year edition histogram only when its rank is recorded.
   # This creates a plotting subset; rolling_clean keeps all original NA values.
+  
+  # label unrecorded ones
   filter(!is.na(rank)) |>
-  mutate(
-    # Label missing genres so these albums remain visible in the chart.
-    # This label does not guess the missing genre.
-    genre_display = if_else(
+  mutate(genre_display = if_else(
       is.na(genre),
       "Genre not recorded",
       genre
     )
   )
 
-# Check that each edition contributes 500 albums.
+# Check that each year -> 500 albums.
 rolling_hist_data |>
   count(edition)
 
@@ -331,16 +269,67 @@ rolling_hist_data |>
 rolling_hist_data |>
   distinct(genre_display) |>
   arrange(genre_display)
+
+# Correct the capitalization typo I saw so the same genre uses one label and color
+rolling_hist_data <- rolling_hist_data |>
+  mutate(
+    genre_display = if_else(
+      genre_display == "Blues/Blues ROck",
+      "Blues/Blues Rock",
+      genre_display
+    )
+  )
 ```
-## ggplot time!!
+
+### 3.10 Genre Counts
+
+Genres are counted by genre and edition from cleaned data in preparation for modelling. Absent values labelled as zeros; not missing genre information.
 
 ```{r}
-#just check first it's installed
+#| echo: false
+
+# Count album entries by genre and edition.
+
+genre_counts <- rolling_hist_data |>
+  count(genre_display, edition, name = "album_count") |>
+  complete(
+    genre_display,
+    edition = c("2003", "2012", "2020"),
+    fill = list(album_count = 0)
+  ) |>
+  arrange(genre_display, edition)
+```
+
+### 3.11 Changes in representation
+Genre counts were arranged into separate columns for each edition. The differences were calculated and sorted from the largest increase to the largest decrease.
+
+```{r}
+#| echo: false
+genre_changes <- genre_counts |>
+  pivot_wider(
+    names_from = edition,
+    names_prefix = "albums_",
+    values_from = album_count
+  ) |>
+  mutate(
+    change_2003_2020 = albums_2020 - albums_2003
+  ) |>
+  arrange(desc(change_2003_2020))
+
+genre_changes
+```
+
+## 4.0 Modelling and Analysis
+
+We compare album counts by release decade and genre across the 2003, 2012 and 2020 editions. A histogram suits the outcomes we wish to meet because release year is continuous and each edition has 500 albums. Ten-year bins give one bar per decade, and faceting lets us compare editions directly, seeing an overall shape of distribution.
+
+No predictive model is fitted: the questions are descriptive; analysis consists of quantifying differences between the lists.
+
+### 4.1 Setting up base plot
+
+```{r}
+#remember x3 things required
 library(ggplot2)
-```
-
-```{r}
-#remember x3 things required 
 base_plot <- ggplot(
   data = rolling_hist_data,
   aes(x = release_year)
@@ -356,7 +345,10 @@ base_plot <- ggplot(
 base_plot
 ```
 
-## Adding more style
+### 4.2 Stylizing
+
+Histogram formatted with release years in ten-year bins, colored by genre and split by yearly edition
+
 ```{r}
 histogram_plot <- base_plot +
   geom_histogram(
@@ -366,10 +358,71 @@ histogram_plot <- base_plot +
     closed = "left"
   ) +
   facet_wrap(~ edition, ncol = 1)
-# genre text is too high; amendment
+# genre text is too high; sort out!!!
 histogram_plot <- histogram_plot +
   labs(
     title = "Release decades and genres\nin Rolling Stone's album lists"
   )
 histogram_plot
+```
+
+### 4.3 Changes in yearly representation of genres
+
+Grouped by release decade. Bars are coloured by direction: positive values mean more albums in 2020, negative values mean fewer.
+
+```{r}
+# Positive values mean more albums in 2020; negative values mean fewer.
+genre_changes <- genre_changes |>
+  mutate(
+    trend = case_when(
+      change_2003_2020 > 0 ~ "More in 2020",
+      change_2003_2020 < 0 ~ "Fewer in 2020",
+      TRUE ~ "No change"
+    )
+  )
+
+genre_change_plot <- ggplot(
+  genre_changes,
+  aes(
+    x = change_2003_2020,
+    y = reorder(genre_display, change_2003_2020),
+    fill = trend
+  )
+) +
+  geom_col() +
+  geom_vline(xintercept = 0) +
+  scale_fill_manual(
+    values = c(
+      "More in 2020" = "steelblue",
+      "Fewer in 2020" = "darkorange",
+      "No change" = "grey"
+    )
+  ) +
+  labs(
+    title = "Changes in genre representation: 2003 to 2020",
+    x = "Change in album count (2020 minus 2003)",
+    y = "Genre",
+    fill = "Change since 2003"
+  ) +
+  theme_minimal()
+
+genre_change_plot
+
+```
+
+## Calculating the changes in Genre Representation
+
+```{r}
+year_summary <- rolling_hist_data |>
+  group_by(edition) |>
+  summarise(
+    albums           = n(),
+    mean_year        = mean(release_year),
+    median_year      = median(release_year),
+    sd_year          = sd(release_year),
+    share_since_1990 = mean(release_year >= 1990)
+  ) |>
+  ungroup()
+
+year_summary
 ```
