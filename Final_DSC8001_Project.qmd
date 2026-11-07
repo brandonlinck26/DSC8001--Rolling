@@ -17,18 +17,18 @@ execute:
 
 Rolling Stone Magazine's *500 Greatest Albums of All Time* has been published in three editions. Each ranking is a judgement on an album's (studio or complication) industrial significance and popularity rather than an objective assessment of album revenue. We use the CRISP-DM framework and Tidyverse tools in R Studio to assess the changing composition of this list between 2003-2020.
 
-The study will rely on the lists themselves rather than the streaming metrics contained within the data set- streaming has both made music more accessible and also less available, usually via artists withdrawing their catalogs (i.e MBV, Massive Attack in regards to boycotts) or even as a result of change in producer rights.
+The study aims to describe and show trends within the data set to understand how genre popularity has changed over time.
 
 ## 2.1 Business Understanding
 
-Listed rankings of music will always be subjective. The patterns in genres that are favourable and eras that are continually popular should lend towards those within the marketing realm or, to aid artists to change their brand in the support of their individual success; to see what's trending may indicate what to tap into. Equally, artists can be advised on whether to engage more with streaming services if there has been a significant dip since their exit from such providers.
+Listed rankings of music will always be subjective. The patterns in genres that are favorable and eras that are continually popular should lend towards those within the marketing realm or, to aid artists to change their brand in the support of their individual success; to see what's trending may indicate what to tap into. Equally, artists can be advised on whether to engage more with a certain genre if it appears it is following a trend.
 
 ### 2.2 Objective
 
 Questions to answer:
 
-1.  How has the representation of album rankings changed across 2003, 2012, and 2020 editions?
-2.  Have older releases been impacted and could this be a result of the advent of modern streaming of music?
+1.  How has the representation of album rankings changed across the years (what's in now?)
+2.  What genres are highest rated over time and will be consistently popular?
 
 ## 3.0 Data Understanding & Initial Exploration
 
@@ -53,7 +53,6 @@ rolling_raw <- read_csv(
 We want to understand what each data type is before changing any behaviors; release year appears as <dbl> -\> does not need converting as years are whole numbers.
 
 ```{r}
-#| echo: false
 head(rolling_raw)
 nrow(rolling_raw)
 ncol(rolling_raw)
@@ -72,7 +71,6 @@ Each ranking column contains 191 missing values, leaving 500 recorded entries pe
 Release year is complete, allowing all albums to be grouped to a decade. Genre is missing for 164 albums; these records are retained and labelled “Genre not recorded” for visualisation
 
 ```{r}
-#| echo: false
 #empty column inspection
 rolling_raw |>
   select(release_year, genre, rank_2003, rank_2012, rank_2020) |>
@@ -85,7 +83,6 @@ rolling_raw |>
 We want to remove any duplicates of albums i.e studio and complication which will affect ranking, yet still including albums by same artist or Na's. Furthermore, ranks may be shared and we want to reassign or disclude these rankings.
 
 ```{r}
-#| echo: false
 # I want to count duplicated rows and amend using duplicated() + distinct()
 sum(duplicated(rolling_raw))
 rolling_unique <- rolling_raw |>
@@ -102,7 +99,6 @@ nrow(rolling_unique)
 Here we assign our identifiers and cut down the data, focusing on Rolling Stone ranking and year of release.
 
 ```{r}
-#| echo: false
 # Keep identifiers and the variables needed for decade and genre comparisons.
 rolling_selected <- rolling_unique |>
   select(
@@ -121,7 +117,6 @@ rolling_selected <- rolling_unique |>
 Across the 2003 to 2020 editions, four rows share a rank (in 2003 only): in each case the albums and artists are different, so they are not duplicates. These ranks have been left unchanged because no adequate replacements could be found.
 
 ```{r}
-#| echo: false
 # !na - treating as a valid rank
 notvalid_ranks <- rolling_selected |>
   filter(
@@ -141,7 +136,6 @@ Four albums have repeated shared rankings within the data. Since they are differ
 ```{r}
 #which ranking numbers appear more than once...?
 #rank 2003
-#| echo: false
 rolling_selected |>
   filter(!is.na(rank_2003)) |>
   count(rank_2003) |>
@@ -173,7 +167,6 @@ The calculation (release_year / 10) \* 10 groups allows for a comparison of both
 :::
 
 ```{r}
-#| echo: false
 #  group albums into ten-year periods.
 # Divide each release year by 10
 # Multiply by 10 to obtain the decade's starting year.
@@ -292,10 +285,7 @@ rolling_hist_data <- rolling_hist_data |>
 Genres are counted by genre and edition from cleaned data in preparation for modelling. Absent values labelled as zeros; not missing genre information.
 
 ```{r}
-#| echo: false
-
 # Count album entries by genre and edition.
-
 genre_counts <- rolling_hist_data |>
   count(genre_display, edition, name = "album_count") |>
   complete(
@@ -311,7 +301,6 @@ genre_counts <- rolling_hist_data |>
 Genre counts were arranged into separate columns for each edition. The differences were calculated and sorted from the largest increase to the largest decrease.
 
 ```{r}
-#| echo: false
 genre_changes <- genre_counts |>
   pivot_wider(
     names_from = edition,
@@ -350,15 +339,15 @@ base_plot <- ggplot(
   )
 ```
 
-### 4.2 Stylizing
+### 4.2 Genre Density per Release Year
 
-Histogram formatted with release years in ten-year bins, colored by genre and split by yearly edition
+Figure 1. Histogram formatted with release years in decade intervals; displays the distribution of genres along a timeline from 1950-2020 as ranked by each edition of Rolling Stone magazine.
 
 ```{r}
 #| include: true
 #| echo: false
 #| fig-width: 11
-#| fig-height: 9
+#| fig-height: 8
 histogram_plot <- base_plot +
   geom_histogram(
     aes(fill = genre_display),
@@ -375,9 +364,11 @@ histogram_plot <- histogram_plot +
 histogram_plot
 ```
 
+Genres and music from the 1970s remained the most represented release decade across all three editions; unsurprisingly as Stone Rose Magazine ranks Sgt Peppers' Lonely Hearts at #1. The 1960s experienced the largest decrease, falling from 111 to 71 entries. In contrast, representation of the 1990s increased from 78 to 104 albums. Albums from the 2000s rose from 22 to 51 and the 2010s reached 36 entries in 2020.
+
 ### 4.3 Changes in yearly representation of genres
 
-Bar chart compares genre counts between the 2003 and 2020.Each bar represents the difference in album counts, being colour coded to show positive or negative changes. Rather than a change in ranking position, it measures the growth in genre amounts. “Genre not recorded” identifies albums with missing genre information
+Figure 2. Changes in genre representation between the 2003 and 2020. Bars represent the difference in album counts, being color coded to show positive or negative changes. Rather than a change in ranking position, it measures the increase or decline in genre density. “Genre not recorded” identifies albums with missing genre information
 
 ```{r}
 #| include: true
@@ -422,3 +413,5 @@ genre_change_plot <- ggplot(
 genre_change_plot
 
 ```
+
+Most apparent is the large increase in Hip-Hop/Rap albums; rising from 26 albums in 2003 to 57 in 2020. Soul/Gospel/R&B gained 20 entries, followed by Indie/Alternative Rock with 12. Blues/Blues Rock experienced the largest decline, falling from 61 to 29 albums. Punk/Post-Punk/New Wave/Power Pop decreased by 14 entries, while Singer-Songwriter/Heartland Rock declined by 11. Big Band/Jazz remained unchanged
