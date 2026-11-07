@@ -1,0 +1,25 @@
+---
+title: "README.md"
+author: "Brandon Linck-Hernandez"
+date: "2026-11-01"
+output: html_document
+---
+
+# Rolling Stone Album Analysis
+
+Author: Brandon Linck-Hernandez
+
+## About this project
+
+This project explores changes in release-decade and recorded genre
+representation across Rolling Stone's 2003, 2012 and 2020 album lists.
+
+The analysis uses R and tidyverse packages, follows the CRISP-DM
+framework, and presents the findings in a Quarto HTML report.
+
+## Project files
+
+- `Final_DSC8001_Project.qmd` — report text and analysis code.
+- `rolling_stone.csv` — original dataset.
+- `Final_DSC8001_Project.html` — rendered report.
+- `README.md` — project setup and reproduction instructions.

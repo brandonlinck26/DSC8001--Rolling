@@ -27,9 +27,8 @@ Listed rankings of music will always be subjective. The patterns in genres that 
 
 Questions to answer:
 
-1.  How has the representation of album rankings changed across the years 
-2.  What genres are highest rated over time and will be consistently popular?
-3. What's in now; emerging trends and popular genres within the market
+1.  How has the representation of albums within the top 500 changed across the years
+2.  Which genres appear in all three ranks. How reliable is a genre at being consistently well ranked?
 
 ## 3.0 Data Understanding & Initial Exploration
 
@@ -420,9 +419,62 @@ Most apparent is the large increase in Hip-Hop/Rap albums; rising from 26 albums
 
 Our analysis identifies key changes within the rolling stones ranking and growth in representation of genres in the 2020s. The release-year distributions were not clearly bell-shaped or symmetric. All editions showed a dominant peak in the 1970s. It could be a suggestion for current artists to create a brand image or products which fall into genres that are consistently ranked highly i.e Rock and Roll, Funk, New Wave.
 
-As shown by Figure 2, the analysis shows a change in the counts of albums; Hip-Hop/Rap albums showed the largest increase, gaining 31 entries, followed by Soul/Gospel/R&B with 20 and Indie/Alternative Rock with 12. Blues/Blues Rock experienced the largest decline, losing 32 entries. 
+As shown by Figure 2, the analysis shows a change in the counts of albums; Hip-Hop/Rap albums showed the largest increase, gaining 31 entries, followed by Soul/Gospel/R&B with 20 and Indie/Alternative Rock with 12. Blues/Blues Rock experienced the largest decline, losing 32 entries.
 
-From a business perspective, the results may enable the targeting of either popular genres within the pool to boost artist success. Especially in the current era of the 2020s, Reggae ton artists like Bad Bunny have seen record breaking growth and boost in popularity; in relation to our data it may be a result of engagement with two key genres emerging within the current decade - Latin and Rap.
+From a business perspective, the results may enable the targeting of genres within the pool to boost artist success (although this requires data on revenue per genre and commercial success). Especially in the current era of the 2020s, Reggae ton artists like Bad Bunny have seen record breaking growth and boost in popularity; in relation to our data it may be a result of engagement with two key genres emerging within the current decade - Latin and Rap.
 
-### Key Limitations 
-However, increased representation does not demonstrate increased consumer demand or guarantee commercial success. The analysis ends in 2020, so it cannot establish what is currently trending. Recent streaming, sales and audience data would be needed to support present-day marketing decisions.
+### 5.1 Key Limitations
+
+### Missing Data
+
+::: callout-note
+A key hindrance to the project was the nature of the data- missing genre information limits the conclusions: As well as early works from 1950s onward coming with the challenge of loss of record, many entries in 2003 and 22% in 2020 also had no recorded genre since Rolling Stone Magazine created the data set from Spotify imports.
+
+Artists during this time have moved their rights from one producer to another (Taylor Swift, Prince, Thom Yorke) or in the world of activism, boycotts to Spotify (MBV, Massive Attack) have affected availability to audiences and to those selecting ranks for albums. Although absences have been accounted for, there is a discrepancy within the data in regards to rank and the overall number of albums within plots, hence some genre values may be skewed incorrectly.
+:::
+
+### Lack of Neutral Measure
+
+::: callout-note
+The rankings reflect the judgement of each edition’s voting panel; findings describe Rolling Stone’s canon but not a general population. [From Rolling Stone Magazine website] panel sizes are reported, but its age and background are not, so the 1970s representation may partly be influenced by recall bias, though this cannot be tested currently.The decision to keep Spotify measures excluded because of missing and unreliable values meant also that younger audiences’ listening behaviour is not represented. Therefore conclusions should not be seen to fully reflect current consumer demand.”
+:::
+
+### No real Utility for prediction
+
+::: callout-note
+Although stated in the modelling section (4.0) this study uses no model for looking prospectively towards 'future trends' or growth in kinds of music. Despite the sample size being too small to fit even a simple linear regression model, essentially we have looked at a snapshot of the past to say what worked previously hence it would be unfair to promise a reliable forecast of what's to come.
+
+### Note of Honesty with Accessibility
+
+::: callout-note
+Admittedly, Figure 1 although displaying results which do aim to answer the research question- the colors selected are not particularly accessible. For reproducible data, and despite the time restraint on the project, an immediate improvement that should be prioritized is to choose colors which still represent the analysis well, but are easier for readability.
+
+## 6.0 Deployment and Future Improvements
+
+The analysis is delivered as a Quarto HTML report containing two figures and their interpretation. The accompanying R Project includes the source CSV, analysis code and README instructions so the findings can be reproduced.
+
+### 6.1 Improving Data Completeness
+
+The first priority is to investigate the 164 albums without recorded genres. Verified classifications could be collected from a documented external source, using consistent rules for broad and overlapping genres. These records should be matched by artist and album, with source references retained. Comparing the original and enriched results would show whether missing classifications substantially affect the observed changes.
+
+### 6.2 Strengthening Validation
+
+Repeated 2003 ranking positions should be checked against the original published list. Any verified corrections should be documented. Automated checks could then confirm that each edition contains 500 entries, valid ranking positions and no unintended duplicate album records.
+
+### 6.3 Extending the Comparisons
+
+Future analysis could distinguish albums entering, leaving and remaining in each edition. This would reveal whether stable genre totals conceal substantial changes in the albums selected. Restricting a comparison to albums released before 2003 would also help separate changes in selection from the availability of newer releases.
+
+### 6.4 Assessing Business Relevance
+
+Commercial recommendations would require a separate analysis using recent streaming, sales or audience data from appropriate sources. By using streaming data from Bandcamp and Spotify, it may address the challenges brought by artist withdrawal leading to absent values. Furthermore, this could test whether increased representation in the lists is associated with consumer demand. MusicBrainz could support album identification by using its SQL query function.
+
+### 7.0 Acknowledgements
+Bandcamp (n.d.) About us. Available at: https://bandcamp.com/about (Accessed: 7 November 2026).
+
+Chapman, P. et al. (2000) CRISP-DM 1.0: Step-by-step data mining guide. SPSS Inc.
+
+Rolling Stone (2020) The 500 greatest albums of all time. Available at: https://www.rollingstone.com/music/music-lists/best-albums-of-all-time-1062063/ (Accessed: 7 November 2026).
+
+Wickham, H. et al. (2019) ‘Welcome to the tidyverse’, Journal of Open Source Software, 4(43), article 1686. https://doi.org/10.21105/joss.01686.
+
